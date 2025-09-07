@@ -9,17 +9,19 @@ public class JuegoPapel{
 
         int choice;         // elección del jugador (1..3)
         int randomNumber;   // elección de la PC (1..3)
-        int scoreJugador=0; // marcador del jugador
-        int scorePC=0;      // marcador de la PC
+        int scoreJugador = 0; // marcador del jugador
+        int scorePC = 0;      // marcador de la PC
+        int ronda = 1; //cuenta las rondas
 
-        System.out.println("Bienvenido al Juego de Piedra, Papel o Tijeras!\nJugaremos hasta que alguien gane 2 de 3 rondas");
+        System.out.println("Bienvenido al Juego de Piedra, Papel o Tijeras!\nJugaremos 3 rondas");
 
-        //Bucle principal: Evalua si algún jugador tiene suficientes puntos para ganar 
-        while(scoreJugador<2 && scorePC<2){
-            
+        //Bucle principal: Termina hasta que se juegen 3 rondas o se consigan 2 puntos
+        while(ronda <= 3 && scoreJugador < 2 && scorePC <2){
+            System.out.println("\nRonda " + ronda + ":");
+
             //Bucle que evalua que no haya strings o numeros fuera de rango, se rompe el bucle al recibir un entero entre el 1 y el 3
             while (true) {
-                System.out.println("Escoge un valor, solo escribe el número:\n1. Piedra | 2. Papel | 3. Tijeras");
+                System.out.println("Escoge un valor, solo escribe el número\n1. Piedra | 2. Papel | 3. Tijeras");
                 
                 // Si lo siguiente NO es un entero (letras, símbolos, etc.), descarta y vuelve a pedir
                 if (!sc.hasNextInt()) {              
@@ -47,19 +49,23 @@ public class JuegoPapel{
             if (resultado == 1) scoreJugador++;
             else if (resultado == 2) scorePC++;
             
+            //Suma el numero de rondas
+            ronda++;
+
             // Muestra resultado de la ronda y marcadores actuales
             imprimirGanador(resultado, choice, randomNumber);
-            System.out.println("Tu score actual es " + scoreJugador + ", y el score de tu PC es: " + scorePC);
+            System.out.println("Tu score actual es " + scoreJugador + ", y mi score es: " + scorePC);
         }     
 
-        // Mensaje final cuando alguien alcanza 2 puntos
-        if(scoreJugador>=2){
+        // Mensaje final después de 3 rondas
+        if(scoreJugador > scorePC){
             System.out.println("Has ganado! Felicidades");
-            System.out.println("Tu score final es " + scoreJugador + ", y el score final de tu PC es: " + scorePC);
-        } else if(scorePC>=2){
+        } else if(scorePC > scoreJugador){
             System.out.println("Has perdido!");
-            System.out.println("Tu score final es " + scoreJugador + ", y el score final de tu PC es: " + scorePC);
+        }   else {
+            System.out.println("Es un empate!");
         }
+        System.out.println("Tu score final es " + scoreJugador + ", y mi score es: " + scorePC);
     }
 
     /* Método para comparar los el valores ingresados
@@ -96,7 +102,7 @@ public class JuegoPapel{
                 System.out.println("Ganaste la ronda! " + nameChoice + " vence a " + namePC);
             break;
             case 2:
-                System.out.println("Perdiste la ronda! " + nameChoice + " vence a " + namePC);
+                System.out.println("Perdiste la ronda! " + namePC + " vence a " + nameChoice);
             break;
         }
     }
