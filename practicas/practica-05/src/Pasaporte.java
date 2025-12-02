@@ -2,7 +2,7 @@ import java.util.Date;
 import java.util.Calendar;
 
 /**
- * Clase Pasaporte con comentarios originales del usuario.
+ * Clase Pasaporte 
  */
 public class Pasaporte {
 
