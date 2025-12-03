@@ -1,0 +1,139 @@
+@startuml
+skinparam linetype ortho
+skinparam layout new
+
+interface Identificable {
+    + getId(): int
+}
+
+interface Persistible {
+    + toLineaTexto(): String
+    + fromLineaTexto(linea: String): void
+}
+
+abstract class Persona {
+    - nombreCompleto: String
+    + getNombreCompleto(): String
+    + setNombreCompleto(nombre: String): void
+    + getIdentificador(): String
+}
+
+class Profesor extends Persona implements Identificable, Persistible {
+    - numeroTrabajador: int
+    - nivelesQueDa: String[]
+    - categoriasQueDa: String[]
+    - titulo: String
+    - anioTitulo: int
+    + getId(): int
+    + puedeImpartir(nivel: String, categoria: String): boolean
+}
+
+class Alumno extends Persona implements Identificable, Persistible {
+    - numeroCuenta: int
+    - edad: int
+    - escuelaProcedencia: String
+    - cursosInscritos: Curso[]
+    - contadorCursos: int
+    + getId(): int
+    + puedeInscribirOtroCurso(): boolean
+}
+
+class Fecha {
+    - dia: int
+    - mes: int
+    - anio: int
+    + esAnteriorA(otra: Fecha): boolean
+    + esPosteriorA(otra: Fecha): boolean
+    + esEntre(inicio: Fecha, fin: Fecha): boolean
+}
+
+class Curso implements Identificable, Persistible {
+    - idCurso: int
+    - nombre: String
+    - categoria: String
+    - nivel: String
+    - horario: String
+    - plataforma: String
+    - numeroEstudiantesMax: int
+    - descripcion: String
+    - fechaInicioInscripciones: Fecha
+    - fechaFinInscripciones: Fecha
+    - fechaInicioCurso: Fecha
+    - fechaFinCurso: Fecha
+    - profesorAsignado: Profesor
+    - alumnosInscritos: Alumno[]
+    - contadorAlumnos: int
+    + getId(): int
+    + estaEnPeriodoInscripcion(hoy: Fecha): boolean
+    + haIniciado(hoy: Fecha): boolean
+    + haTerminado(hoy: Fecha): boolean
+    + inscribirAlumno(a: Alumno): void
+    + desinscribirAlumno(a: Alumno): void
+}
+
+abstract class RepositorioBase<T> {
+    # elementos: T[]
+    # contador: int
+    + agregar(t: T): void
+    + buscarPorId(id: int): T
+    + eliminarPorId(id: int): void
+    + getTodos(): T[]
+    + guardarTodo(ruta: String): void
+    + cargarTodo(ruta: String): void
+}
+
+class RepositorioCursos extends RepositorioBase<Curso> {
+}
+class RepositorioProfesores extends RepositorioBase<Profesor> {
+}
+class RepositorioAlumnos extends RepositorioBase<Alumno> {
+}
+
+class GestorCursos {
+    - repoCursos: RepositorioCursos
+    - repoProfesores: RepositorioProfesores
+    - repoAlumnos: RepositorioAlumnos
+}
+
+class GestorProfesores {
+    - repoProfesores: RepositorioProfesores
+}
+
+class GestorAlumnos {
+    - repoAlumnos: RepositorioAlumnos
+}
+
+class SistemaGestionCursos {
+    + main(args: String[]): void
+}
+
+
+
+Profesor "1" --> "0..*" Curso : imparte >
+Curso "1" --> "0..*" Alumno : inscribe >
+Alumno "1" --> "0..*" Curso : cursa >
+
+
+GestorCursos --> RepositorioCursos
+GestorCursos --> RepositorioProfesores
+GestorCursos --> RepositorioAlumnos
+
+GestorProfesores --> RepositorioProfesores
+GestorAlumnos --> RepositorioAlumnos
+
+
+' ====== CAPA DE INTERFAZ ======
+
+class MenuConsola {
+    + mostrarMenuPrincipal(): void
+    + menuCursos(): void
+    + menuProfesores(): void
+    + menuAlumnos(): void
+}
+
+
+SistemaGestionCursos --> MenuConsola
+MenuConsola --> GestorCursos
+MenuConsola --> GestorProfesores
+MenuConsola --> GestorAlumnos
+@enduml
