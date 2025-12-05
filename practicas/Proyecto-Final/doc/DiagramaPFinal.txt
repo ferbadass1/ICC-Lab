@@ -1,6 +1,48 @@
 @startuml
 skinparam linetype ortho
 skinparam layout new
+skinparam classAttributeIconSize 0
+left to right direction
+
+
+' ============== EXCEPCIONES ===============
+
+package "excepciones" {
+
+
+  class DatosInvalidosException <<exception>> {
+  }
+
+  class NoEncontradoException <<exception>> {
+  }
+
+  class CapacidadLlenaException <<exception>> {
+  }
+
+  class InscripcionException <<exception>> {
+  }
+
+  class AsignacionProfesorException <<exception>> {
+  }
+
+  class EliminacionNoPermitidaException <<exception>> {
+  }
+
+  class FormatoInvalidoException <<exception>> {
+  }
+
+  Exception <|-- DatosInvalidosException
+  Exception <|-- NoEncontradoException
+  Exception <|-- CapacidadLlenaException
+  Exception <|-- InscripcionException
+  Exception <|-- AsignacionProfesorException
+  Exception <|-- EliminacionNoPermitidaException
+  Exception <|-- FormatoInvalidoException
+
+}
+
+
+package "Clases"{
 
 interface Identificable {
     + getId(): int
@@ -136,4 +178,7 @@ SistemaGestionCursos --> MenuConsola
 MenuConsola --> GestorCursos
 MenuConsola --> GestorProfesores
 MenuConsola --> GestorAlumnos
+
+}
+
 @enduml
