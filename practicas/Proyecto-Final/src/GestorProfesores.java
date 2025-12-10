@@ -1,24 +1,42 @@
 /**
  * Clase Gestor: GestorProfesores
  *
- * Encargada de las operaciones de negocio sobre profesores:
- * alta, búsqueda, edición y eliminación segura.
+ * Se encarga de las operaciones de negocio relacionadas con profesores:
+ * registro, búsqueda, eliminación y obtención del listado general,
+ * apoyándose en los repositorios correspondientes.
  */
 public class GestorProfesores {
 
+    /** Repositorio que administra el almacenamiento de profesores. */
     private RepositorioProfesores repoProfesores;
+
+    /** Repositorio que permite consultar los cursos registrados. */
     private RepositorioCursos repoCursos;
 
+    /**
+     * Construye un gestor de profesores a partir de los repositorios
+     * proporcionados.
+     *
+     * @param repoProfesores Repositorio de profesores.
+     * @param repoCursos     Repositorio de cursos.
+     */
     public GestorProfesores(RepositorioProfesores repoProfesores,
                             RepositorioCursos repoCursos) {
         this.repoProfesores = repoProfesores;
         this.repoCursos = repoCursos;
     }
 
-        /**
-     * Registra un nuevo profesor verificando que:
-     * - tenga nombre válido
-     * - su número de trabajador no esté repetido
+    /**
+     * Registra un nuevo profesor en el sistema.
+     *
+     * Valida que el profesor no sea nulo, que cuente con un nombre
+     * no vacío y que su número de trabajador no esté registrado
+     * previamente en el repositorio.
+     *
+     * @param profesor Profesor a registrar.
+     * @throws CapacidadLlenaException Si el repositorio no admite más profesores.
+     * @throws DatosInvalidosException Si el nombre es inválido o el número de
+     *                                 trabajador ya existe.
      */
     public void registrarProfesor(Profesor profesor)
         throws CapacidadLlenaException, DatosInvalidosException {
@@ -39,11 +57,30 @@ public class GestorProfesores {
             // OK: no existe, podemos continuar
         }
 
-    repoProfesores.agregar(profesor);
-}
+        repoProfesores.agregar(profesor);
+    }
 
     /**
-     * Solo se puede eliminar un profesor que NO esté asignado a ningún curso.
+     * Busca un profesor a partir de su número de trabajador.
+     *
+     * @param numTrabajador Número de trabajador del profesor.
+     * @return Profesor correspondiente al número indicado.
+     * @throws NoEncontradoException Si no existe un profesor con ese número.
+     */
+    public Profesor buscarProfesor(int numTrabajador) throws NoEncontradoException {
+        return repoProfesores.buscarPorId(numTrabajador);
+    }
+
+    /**
+     * Elimina un profesor del sistema, siempre que no esté asignado a
+     * ningún curso registrado.
+     *
+     * Si el profesor se encuentra como profesor asignado en al menos
+     * un curso, la eliminación no está permitida.
+     *
+     * @param numTrabajador Número de trabajador del profesor a eliminar.
+     * @throws NoEncontradoException          Si no existe un profesor con ese número.
+     * @throws EliminacionNoPermitidaException Si el profesor está asignado a algún curso.
      */
     public void eliminarProfesor(int numTrabajador)
             throws NoEncontradoException, EliminacionNoPermitidaException {
@@ -61,6 +98,12 @@ public class GestorProfesores {
         repoProfesores.eliminarPorId(numTrabajador);
     }
 
+    /**
+     * Devuelve el listado completo de profesores administrados
+     * por el repositorio.
+     *
+     * @return Arreglo de profesores; puede contener posiciones nulas.
+     */
     public Profesor[] listarProfesores() {
         return repoProfesores.getTodos();
     }

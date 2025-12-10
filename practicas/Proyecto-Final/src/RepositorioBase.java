@@ -1,20 +1,25 @@
 /**
- * Clase Abstracta: RepositorioBase<T>
+ * Clase Abstracta: RepositorioBase&lt;T&gt;
  *
  * Implementa un repositorio genérico usando arreglos,
- * sin listas ni colecciones, con soporte de persistencia.
+ * sin listas ni colecciones, con soporte de persistencia
+ * en archivos de texto.
  *
- * @param <T> Tipo genérico que debe ser Identificable y Persistible.
+ * @param <T> Tipo genérico que debe ser {Identificable} y {Persistible}.
  */
 public abstract class RepositorioBase<T extends Identificable & Persistible> {
 
+    /** Arreglo interno donde se almacenan los elementos del repositorio. */
     protected T[] elementos;
+
+    /** Número actual de elementos válidos almacenados en el arreglo. */
     protected int contador;
 
     /**
      * Constructor del repositorio.
      *
-     * Se recibe un arreglo ya creado por la subclase concreta.
+     * Se recibe un arreglo ya creado por la subclase concreta, que
+     * determina la capacidad máxima del repositorio.
      *
      * @param arreglo Arreglo donde se almacenarán los elementos.
      */
@@ -22,7 +27,6 @@ public abstract class RepositorioBase<T extends Identificable & Persistible> {
         this.elementos = arreglo;
         this.contador = 0;
     }
-
 
     /**
      * Método Calculador: agregar
@@ -63,6 +67,8 @@ public abstract class RepositorioBase<T extends Identificable & Persistible> {
      * Método Calculador: eliminarPorId
      *
      * Elimina el elemento con el identificador indicado.
+     * Tras la eliminación, compacta el arreglo desplazando los
+     * elementos posteriores una posición hacia la izquierda.
      *
      * @param id Identificador del elemento.
      * @throws NoEncontradoException si no existe.
@@ -86,9 +92,11 @@ public abstract class RepositorioBase<T extends Identificable & Persistible> {
     }
 
     /**
-     * Devuelve el arreglo interno (puede contener posiciones null).
+     * Devuelve el arreglo interno de elementos.
+     * Puede contener posiciones en la parte final
+     * si no se ha llenado completamente la capacidad.
      *
-     * @return Arreglo de elementos.
+     * @return Arreglo de elementos almacenados.
      */
     public T[] getTodos() {
         return elementos;
@@ -96,6 +104,16 @@ public abstract class RepositorioBase<T extends Identificable & Persistible> {
 
     // ================== PERSISTENCIA ==================
 
+    /**
+     * Guarda todos los elementos del repositorio en un archivo de texto.
+     *
+     * Cada elemento se escribe en una línea, utilizando para ello
+     * su método {Persistible#toLineaTexto()}.
+     *
+     * @param ruta Ruta del archivo donde se guardarán los datos.
+     * @throws java.io.IOException Si ocurre un error de entrada/salida
+     *                             durante la escritura del archivo.
+     */
     public void guardarTodo(String ruta) throws java.io.IOException {
         java.io.BufferedWriter bw = new java.io.BufferedWriter(
                 new java.io.FileWriter(ruta));
@@ -106,6 +124,20 @@ public abstract class RepositorioBase<T extends Identificable & Persistible> {
         bw.close();
     }
 
+    /**
+     * Carga todos los elementos desde un archivo de texto,
+     * reemplazando el contenido actual del repositorio.
+     *
+     * Cada línea del archivo se convierte en un objeto {T}
+     * mediante el método {crearDesdeLinea(String)} de la subclase.
+     *
+     * Si el archivo no existe, el método no hace nada.
+     *
+     * @param ruta Ruta del archivo desde donde se leerán los datos.
+     * @throws java.io.IOException         Si ocurre un error de lectura.
+     * @throws FormatoInvalidoException    Si alguna línea no cumple el formato
+     *                                     esperado para reconstruir el objeto.
+     */
     public void cargarTodo(String ruta)
             throws java.io.IOException, FormatoInvalidoException {
         java.io.File archivo = new java.io.File(ruta);
@@ -126,10 +158,11 @@ public abstract class RepositorioBase<T extends Identificable & Persistible> {
     /**
      * Método Abstracto: crearDesdeLinea
      *
-     * Cada subclase sabe cómo construir su objeto T desde una línea de texto.
+     * Cada subclase sabe cómo construir su objeto {T} desde una
+     * línea de texto previamente serializada.
      *
      * @param linea Línea leída del archivo.
-     * @return Objeto T creado a partir de la línea.
+     * @return Objeto {@code T} creado a partir de la línea.
      * @throws FormatoInvalidoException si la línea no tiene el formato correcto.
      */
     protected abstract T crearDesdeLinea(String linea) throws FormatoInvalidoException;

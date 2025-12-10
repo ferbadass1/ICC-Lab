@@ -1,12 +1,11 @@
 /**
- * Clase Calculador: Catalogos
+ * Clase Calculadora: Catalogos
  *
  * Encargada de definir los valores válidos para categorías, niveles,
  * plataformas y de ofrecer métodos de validación reutilizables.
  */
 public final class Catalogos {
 
-    // Evitamos instanciar esta clase de utilería.
     private Catalogos() {}
 
     /** Categorías válidas de curso. */
