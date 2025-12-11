@@ -8,20 +8,22 @@ left to right direction
 
 package "excepciones" {
 
-
-  class DatosInvalidosException <<exception>> {
+  class InscripcionException <<exception>> {
   }
 
   class NoEncontradoException <<exception>> {
   }
 
+  class CategoriaInvalidaException <<exception>> {
+  }
+
   class CapacidadLlenaException <<exception>> {
   }
 
-  class InscripcionException <<exception>> {
+  class AsignacionProfesorException <<exception>> {
   }
 
-  class AsignacionProfesorException <<exception>> {
+  class DatosInvalidosException <<exception>> {
   }
 
   class EliminacionNoPermitidaException <<exception>> {
@@ -31,6 +33,7 @@ package "excepciones" {
   }
 
   Exception <|-- DatosInvalidosException
+  Exception <|-- CategoriaInvalidaException
   Exception <|-- NoEncontradoException
   Exception <|-- CapacidadLlenaException
   Exception <|-- InscripcionException

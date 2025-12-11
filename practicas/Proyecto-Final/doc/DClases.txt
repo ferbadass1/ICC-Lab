@@ -3,8 +3,9 @@ skinparam linetype ortho
 skinparam layout new
 skinparam classAttributeIconSize 0
 
+package "Clases" {
 
-package "Clases"{
+' ====== INTERFACES BÁSICAS ======
 
 interface Identificable {
     + getId(): int
@@ -15,12 +16,16 @@ interface Persistible {
     + fromLineaTexto(linea: String): void
 }
 
+' ====== PERSONAJE BASE ======
+
 abstract class Persona {
-    - nombreCompleto: String
+    # nombreCompleto: String
     + getNombreCompleto(): String
     + setNombreCompleto(nombre: String): void
     + getIdentificador(): String
 }
+
+' ====== MODELO: PROFESOR ======
 
 class Profesor extends Persona implements Identificable, Persistible {
     - numeroTrabajador: int
@@ -28,9 +33,26 @@ class Profesor extends Persona implements Identificable, Persistible {
     - categoriasQueDa: String[]
     - titulo: String
     - anioTitulo: int
+
     + getId(): int
+    + getNumeroTrabajador(): int
+    + setNumeroTrabajador(numero: int): void
+    + getNivelesQueDa(): String[]
+    + setNivelesQueDa(niveles: String[]): void
+    + getCategoriasQueDa(): String[]
+    + setCategoriasQueDa(categorias: String[]): void
+    + getTitulo(): String
+    + setTitulo(titulo: String): void
+    + getAnioTitulo(): int
+    + setAnioTitulo(anio: int): void
+
     + puedeImpartir(nivel: String, categoria: String): boolean
+    + verificarCategoriasProfesor(categorias: String): void
+    + toLineaTexto(): String
+    + fromLineaTexto(linea: String): void
 }
+
+' ====== MODELO: ALUMNO ======
 
 class Alumno extends Persona implements Identificable, Persistible {
     - numeroCuenta: int
@@ -38,18 +60,38 @@ class Alumno extends Persona implements Identificable, Persistible {
     - escuelaProcedencia: String
     - cursosInscritos: Curso[]
     - contadorCursos: int
+
     + getId(): int
+    + getNumeroCuenta(): int
+    + setNumeroCuenta(num: int): void
+    + getEdad(): int
+    + setEdad(edad: int): void
+    + getEscuelaProcedencia(): String
+    + setEscuelaProcedencia(escuela: String): void
+
     + puedeInscribirOtroCurso(): boolean
+    + agregarCurso(curso: Curso): void
+
+    + toLineaTexto(): String
+    + fromLineaTexto(linea: String): void
 }
+
+' ====== FECHA ======
 
 class Fecha {
     - dia: int
     - mes: int
     - anio: int
+
     + esAnteriorA(otra: Fecha): boolean
     + esPosteriorA(otra: Fecha): boolean
     + esEntre(inicio: Fecha, fin: Fecha): boolean
+    + toString(): String
+    + static fromString(texto: String): Fecha
+    + static hoy(): Fecha
 }
+
+' ====== MODELO: CURSO ======
 
 class Curso implements Identificable, Persistible {
     - idCurso: int
@@ -67,56 +109,134 @@ class Curso implements Identificable, Persistible {
     - profesorAsignado: Profesor
     - alumnosInscritos: Alumno[]
     - contadorAlumnos: int
+
+    ' para reconstruir relaciones desde archivos
+    - idProfesorGuardado: int
+    - idsAlumnosGuardados: int[]
+    - contadorAlumnosGuardados: int
+
     + getId(): int
+    + getNombre(): String
+    + setNombre(nombre: String): void
+    + getCategoria(): String
+    + setCategoria(cat: String): void
+    + getNivel(): String
+    + setNivel(nivel: String): void
+    + getHorario(): String
+    + setHorario(horario: String): void
+    + getPlataforma(): String
+    + setPlataforma(p: String): void
+    + getDescripcion(): String
+    + setDescripcion(desc: String): void
+    + getNumeroEstudiantesMax(): int
+    + getContadorAlumnos(): int
+
+    + getProfesorAsignado(): Profesor
+    + setProfesorAsignado(p: Profesor): void
+    + getAlumnosInscritos(): Alumno[]
+
     + estaEnPeriodoInscripcion(hoy: Fecha): boolean
     + haIniciado(hoy: Fecha): boolean
     + haTerminado(hoy: Fecha): boolean
+    + puedeEditarCompletamente(hoy: Fecha): boolean
     + inscribirAlumno(a: Alumno): void
     + desinscribirAlumno(a: Alumno): void
+
+    + getIdProfesorGuardado(): int
+    + getIdsAlumnosGuardados(): int[]
+    + getContadorAlumnosGuardados(): int
+
+    + toLineaTexto(): String
+    + fromLineaTexto(linea: String): void
 }
 
-abstract class RepositorioBase<T> {
+' ====== REPOSITORIOS ======
+
+abstract class RepositorioBase<T extends Identificable & Persistible> {
     # elementos: T[]
     # contador: int
+
     + agregar(t: T): void
     + buscarPorId(id: int): T
     + eliminarPorId(id: int): void
     + getTodos(): T[]
+
     + guardarTodo(ruta: String): void
     + cargarTodo(ruta: String): void
+
+    # crearDesdeLinea(linea: String): T
 }
 
 class RepositorioCursos extends RepositorioBase<Curso> {
 }
+
 class RepositorioProfesores extends RepositorioBase<Profesor> {
 }
+
 class RepositorioAlumnos extends RepositorioBase<Alumno> {
 }
+
+' ====== GESTORES (CAPA LÓGICA) ======
 
 class GestorCursos {
     - repoCursos: RepositorioCursos
     - repoProfesores: RepositorioProfesores
     - repoAlumnos: RepositorioAlumnos
+
+    + registrarCurso(curso: Curso): void
+    + listarCursos(): Curso[]
+    + buscarCurso(id: int): Curso
+    + eliminarCurso(id: int, hoy: Fecha): void
+    + asignarProfesor(idCurso: int, idProfesor: int, hoy: Fecha): void
+    + inscribirAlumnoEnCurso(idCurso: int, idAlumno: int, hoy: Fecha): void
+    + desinscribirAlumnoDeCurso(idCurso: int, idAlumno: int, hoy: Fecha): void
+    + reasignarProfesor(idCurso: int, idProfesor: int, hoy: Fecha): void
 }
 
 class GestorProfesores {
     - repoProfesores: RepositorioProfesores
+    - repoCursos: RepositorioCursos
+
+    + registrarProfesor(p: Profesor): void
+    + buscarProfesor(id: int): Profesor
+    + eliminarProfesor(id: int): void
+    + listarProfesores(): Profesor[]
 }
 
 class GestorAlumnos {
     - repoAlumnos: RepositorioAlumnos
+    - repoCursos: RepositorioCursos
+
+    + registrarAlumno(a: Alumno): void
+    + buscarAlumno(id: int): Alumno
+    + eliminarAlumno(id: int): void
+    + listarAlumnos(): Alumno[]
 }
+
+' ====== APLICACIÓN PRINCIPAL ======
 
 class SistemaGestionCursos {
     + main(args: String[]): void
 }
 
+' ====== CAPA DE INTERFAZ (VISTA) ======
 
+class MenuConsola {
+    - gestorCursos: GestorCursos
+    - gestorProfesores: GestorProfesores
+    - gestorAlumnos: GestorAlumnos
+
+    + mostrarMenuPrincipal(): void
+    + menuCursos(): void
+    + menuProfesores(): void
+    + menuAlumnos(): void
+}
+
+' ====== RELACIONES ENTRE CLASES ======
 
 Profesor "1" --> "0..*" Curso : imparte >
 Curso "1" --> "0..*" Alumno : inscribe >
 Alumno "1" --> "0..*" Curso : cursa >
-
 
 GestorCursos --> RepositorioCursos
 GestorCursos --> RepositorioProfesores
@@ -125,22 +245,10 @@ GestorCursos --> RepositorioAlumnos
 GestorProfesores --> RepositorioProfesores
 GestorAlumnos --> RepositorioAlumnos
 
-
-' ====== CAPA DE INTERFAZ ======
-
-class MenuConsola {
-    + mostrarMenuPrincipal(): void
-    + menuCursos(): void
-    + menuProfesores(): void
-    + menuAlumnos(): void
-}
-
-
 SistemaGestionCursos --> MenuConsola
 MenuConsola --> GestorCursos
 MenuConsola --> GestorProfesores
 MenuConsola --> GestorAlumnos
 
 }
-
 @enduml
